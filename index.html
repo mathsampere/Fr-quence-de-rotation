@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Réglage de perceuse</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #1f2937, #0f4c5c);
+    }
+
+    .carte {
+      width: min(520px, 100%);
+      padding: 32px;
+      border-radius: 20px;
+      background-color: #ffffff;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+    }
+
+    .badge {
+      display: inline-block;
+      margin-bottom: 12px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background-color: #fff3cd;
+      color: #7a4d00;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    h1 {
+      margin: 0;
+      color: #123b4a;
+      font-size: 29px;
+    }
+
+    .sous-titre {
+      margin: 10px 0 24px;
+      color: #52616b;
+      line-height: 1.5;
+    }
+
+    label {
+      display: block;
+      margin-top: 20px;
+      margin-bottom: 7px;
+      color: #1f2937;
+      font-weight: bold;
+    }
+
+    select,
+    input {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      background-color: #ffffff;
+      color: #1f2937;
+      font-size: 16px;
+    }
+
+    select:focus,
+    input:focus {
+      outline: 3px solid #a7d8df;
+      border-color: #0f7b8a;
+    }
+
+    .unite {
+      margin: 7px 0 0;
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 28px;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background-color: #f59e0b;
+      color: #1f2937;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #fbbf24;
+    }
+
+    .resultat {
+      min-height: 100px;
+      margin-top: 25px;
+      padding: 18px;
+      border-radius: 12px;
+      background-color: #eaf7f8;
+      color: #123b4a;
+      text-align: center;
+    }
+
+    .resultat p {
+      margin: 7px 0;
+    }
+
+    .grande-valeur {
+      color: #0f5968;
+      font-size: 31px;
+      font-weight: bold;
+    }
+
+    .formule {
+      margin-top: 25px;
+      padding-top: 18px;
+      border-top: 1px solid #e2e8f0;
+      color: #64748b;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .avertissement {
+      margin-top: 18px;
+      padding: 12px;
+      border-left: 4px solid #f59e0b;
+      border-radius: 6px;
+      background-color: #fff8e7;
+      color: #6b4b09;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="carte">
+    <div class="badge">OUTIL D'AIDE AU RÉGLAGE</div>
+
+    <h1>Réglage de perceuse</h1>
+
+    <p class="sous-titre">
+      Choisis le matériau à percer puis indique le diamètre du foret.
+    </p>
+
+    <label for="materiau">Matériau</label>
+
+    <select id="materiau">
+      <option value="">-- Choisir un matériau --</option>
+      <option value="20">Acier — Vc = 20 m/min</option>
+      <option value="18">Fonte — Vc = 18 m/min</option>
+      <option value="40">Laiton — Vc = 40 m/min</option>
+      <option value="60">Aluminium — Vc = 60 m/min</option>
+    </select>
+
+    <label for="diametre">Diamètre du foret</label>
+
+    <input
+      type="number"
+      id="diametre"
+      min="0"
+      step="0.1"
+      placeholder="Ex. : 8"
+    >
+
+    <p class="unite">Saisir le diamètre en millimètres (mm).</p>
+
+    <button onclick="calculerFrequence()">
+      Calculer la fréquence de rotation
+    </button>
+
+    <div id="resultat" class="resultat">
+      <p>Le réglage théorique apparaîtra ici.</p>
+    </div>
+
+    <div class="formule">
+      Formule utilisée :<br>
+      <strong>N = (1000 × Vc) / (π × D)</strong><br>
+      N : fréquence de rotation en tr/min — Vc : vitesse de coupe en m/min — D : diamètre du foret en mm.
+    </div>
+
+    <div class="avertissement">
+      <strong>Attention :</strong> le résultat est une valeur théorique. Avant le perçage, vérifier les consignes de l’atelier, le type et l’état du foret, le serrage de la pièce ainsi que les vitesses réellement disponibles sur la machine.
+    </div>
+  </main>
+
+  <script>
+    function calculerFrequence() {
+      const materiau = document.getElementById("materiau");
+      const vc = Number(materiau.value);
+      const nomMateriau = materiau.options[materiau.selectedIndex].text;
+
+      const diametre = Number(document.getElementById("diametre").value);
+      const resultat = document.getElementById("resultat");
+
+      if (vc > 0 && diametre > 0) {
+        const frequence = (1000 * vc) / (Math.PI * diametre);
+        const frequenceArrondie = Math.round(frequence);
+
+        resultat.innerHTML =
+          "<p>Fréquence théorique pour " + nomMateriau.split(" —")[0] + "</p>" +
+          "<p class='grande-valeur'>" + frequenceArrondie + " tr/min</p>" +
+          "<p>Diamètre du foret : " + diametre + " mm</p>";
+      } else {
+        resultat.innerHTML =
+          "<p>⚠️ Choisis un matériau et saisis un diamètre strictement positif.</p>";
+      }
+    }
+  </script>
+</body>
+</html>
